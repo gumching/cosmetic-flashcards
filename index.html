@@ -167,7 +167,7 @@ function show(){
     if(d.e){
       h+='<p class="en">'+d.e+'</p>';
       var ttsText=d.e;
-      if(ttsText.indexOf('/')>=0) ttsText=ttsText.split('/')[0];
+      while(ttsText.indexOf('/')>=0) ttsText=ttsText.replace('/',' ');
       var t=encodeURIComponent(ttsText);
       h+='<div class="audio-box"><audio controls preload="none" referrerpolicy="no-referrer">';
       h+='<source src="https://fanyi.baidu.com/gettts?lan=en&text='+t+'&spd=3&source=web" type="audio/mpeg">';
