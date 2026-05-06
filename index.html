@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="format-detection" content="telephone=no">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="referrer" content="no-referrer">
 <title>化妆品原料学习翻卡</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -98,16 +99,32 @@ function doSearch(){
   var cat=document.getElementById('J_cat').value;
   var q=document.getElementById('J_q').value.trim().toLowerCase();
   list=[];
-  for(var k=0;k<D.length;k++){
-    var d=D[k];
-    if(cat && d.c!==cat) continue;
-    if(q && d.n.toLowerCase().indexOf(q)===-1 && d.e.toLowerCase().indexOf(q)===-1) continue;
-    list.push(d);
-  }
-  if(!q && list.length>200){
-    list=shuffle(list).slice(0,200);
-  } else if(!q){
-    list=shuffle(list);
+  if(!q){
+    for(var k=0;k<D.length;k++){
+      var d=D[k];
+      if(cat && d.c!==cat) continue;
+      list.push(d);
+    }
+    if(list.length>200) list=shuffle(list).slice(0,200);
+    else list=shuffle(list);
+  } else {
+    var exact=[];
+    var startsWith=[];
+    var contains=[];
+    for(var k=0;k<D.length;k++){
+      var d=D[k];
+      if(cat && d.c!==cat) continue;
+      var cn=d.n.toLowerCase();
+      var en=d.e.toLowerCase();
+      if(cn===q || en===q){
+        exact.push(d);
+      } else if(cn.indexOf(q)===0 || en.indexOf(q)===0){
+        startsWith.push(d);
+      } else if(cn.indexOf(q)>=0 || en.indexOf(q)>=0){
+        contains.push(d);
+      }
+    }
+    list=exact.concat(startsWith).concat(contains);
   }
   idx=0;
   flipped=false;
@@ -151,8 +168,12 @@ function show(){
       h+='<p class="en">'+d.e+'</p>';
       var ttsText=d.e;
       if(ttsText.indexOf('/')>=0) ttsText=ttsText.split('/')[0];
-      var ttsUrl='https://dict.youdao.com/dictvoice?audio='+encodeURIComponent(ttsText)+'&type=2';
-      h+='<div class="audio-box"><audio controls preload="none" src="'+ttsUrl+'"></audio></div>';
+      var t=encodeURIComponent(ttsText);
+      h+='<div class="audio-box"><audio controls preload="none" referrerpolicy="no-referrer" crossorigin="anonymous">';
+      h+='<source src="https://dict.youdao.com/dictvoice?le=eng&audio='+t+'" type="audio/mpeg">';
+      h+='<source src="https://fanyi.baidu.com/gettts?lan=en&text='+t+'&spd=3&source=web" type="audio/mpeg">';
+      h+='<source src="https://tts.baidu.com/text2audio?tex='+t+'&cuid=dict&lan=en&ctp=1&pdt=30&vol=9&spd=4" type="audio/mpeg">';
+      h+='</audio></div>';
     }
     if(d.x){h+='<div class="dt"><div class="dt-l">最大允许浓度/历史使用量</div><div class="dt-v">'+d.x+'</div></div>';}
     if(d.s){h+='<div class="dt"><div class="dt-l">使用范围</div><div class="dt-v">'+d.s+'</div></div>';}
