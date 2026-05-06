@@ -256,7 +256,7 @@ function show(){
   } else {
     h+='<p class="cn" style="font-size:1.15rem">'+d.n+'</p>';
     h+='<p class="en">'+d.e+'</p>';
-    h+='<button class="speak" onclick="event.stopPropagation();doSpeak()">&#128266; 朗读INCI(美式)</button>';
+    h+='<button class="speak" ontouchend="event.stopPropagation();event.preventDefault();doSpeak()" onclick="event.stopPropagation();doSpeak()">&#128266; 朗读INCI(美式)</button>';
     if(d.x){h+='<div class="dt"><div class="dt-l">最大允许浓度</div><div class="dt-v">'+d.x+'</div></div>';}
     if(d.s){h+='<div class="dt"><div class="dt-l">使用范围</div><div class="dt-v">'+d.s+'</div></div>';}
     if(d.r){h+='<div class="dt"><div class="dt-l">限制条件</div><div class="dt-v">'+d.r+'</div></div>';}
@@ -297,32 +297,57 @@ function getTip(d){
   return t.join('; ');
 }
 
+var _audio=null;
+var _ttsIdx=0;
+function _getTtsUrls(text){
+  var t=encodeURIComponent(text);
+  return [
+    'https://dict.youdao.com/dictvoice?audio='+t+'&type=2',
+    'https://fanyi.baidu.com/gettts?lan=en&text='+t+'&spd=3&source=web',
+    'https://dict.youdao.com/dictvoice?audio='+t+'&type=1'
+  ];
+}
 function doSpeak(){
   if(!list.length) return;
   var text=list[idx].e;
-  try{
-    var audio=document.getElementById('J_audio');
-    if(!audio){
-      audio=document.createElement('audio');
-      audio.id='J_audio';
-      document.body.appendChild(audio);
-    }
-    audio.src='https://dict.youdao.com/dictvoice?audio='+encodeURIComponent(text)+'&type=2';
-    audio.play().catch(function(){
-      if(window.speechSynthesis){
-        var u=new SpeechSynthesisUtterance(text);
-        u.lang='en-US';u.rate=0.75;
-        speechSynthesis.cancel();
-        speechSynthesis.speak(u);
-      }
+  if(text.indexOf('/')>=0){
+    text=text.split('/')[0];
+  }
+  _ttsIdx=0;
+  _playTts(text);
+}
+function _playTts(text){
+  var urls=_getTtsUrls(text);
+  if(_ttsIdx>=urls.length){
+    _trySynth(text);
+    return;
+  }
+  if(!_audio){
+    _audio=new Audio();
+    _audio.setAttribute('playsinline','');
+    _audio.setAttribute('webkit-playsinline','');
+  }
+  _audio.onerror=function(){
+    _ttsIdx++;
+    _playTts(text);
+  };
+  _audio.src=urls[_ttsIdx];
+  var p=_audio.play();
+  if(p&&p.catch){
+    p.catch(function(){
+      _ttsIdx++;
+      _playTts(text);
     });
-  }catch(ex){
-    if(window.speechSynthesis){
+  }
+}
+function _trySynth(text){
+  if(window.speechSynthesis){
+    try{
       var u=new SpeechSynthesisUtterance(text);
       u.lang='en-US';u.rate=0.75;
       speechSynthesis.cancel();
       speechSynthesis.speak(u);
-    }
+    }catch(e){}
   }
 }
 
@@ -376,6 +401,28 @@ document.onkeydown=function(ev){
 };
 
 if(window.speechSynthesis) try{speechSynthesis.getVoices();}catch(e){}
+
+// WeChat/mobile audio unlock: pre-init audio on first user touch
+(function(){
+  var unlocked=false;
+  function unlock(){
+    if(unlocked) return;
+    unlocked=true;
+    if(!_audio){
+      _audio=new Audio();
+      _audio.setAttribute('playsinline','');
+      _audio.setAttribute('webkit-playsinline','');
+    }
+    _audio.src='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+    _audio.play().catch(function(){});
+    _audio.pause();
+    document.removeEventListener('touchstart',unlock,true);
+    document.removeEventListener('click',unlock,true);
+  }
+  document.addEventListener('touchstart',unlock,true);
+  document.addEventListener('click',unlock,true);
+})();
+
 doSearch();
 </script>
 </body>
