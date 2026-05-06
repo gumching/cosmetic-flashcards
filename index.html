@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>化妆品原料学习翻卡</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;padding:15px}
+h1{text-align:center;color:#fff;font-size:1.5rem;margin-bottom:4px}
+.sub{text-align:center;color:rgba(255,255,255,.75);font-size:.78rem;margin-bottom:14px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:14px}
+.bar select,.bar input,.bar button{padding:8px 12px;border:none;border-radius:8px;font-size:.84rem;outline:none}
+.bar select{background:#fff;cursor:pointer}
+.bar input{background:#fff;width:170px}
+.bar button{cursor:pointer;background:rgba(255,255,255,.22);color:#fff;border:1px solid rgba(255,255,255,.4)}
+.bar button:hover{background:rgba(255,255,255,.38)}
+.info{text-align:center;color:rgba(255,255,255,.8);font-size:.78rem;margin-bottom:10px}
+.wrap{display:flex;justify-content:center;margin-bottom:14px}
+.card{width:100%;max-width:520px;background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.22);overflow:hidden;cursor:pointer;user-select:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.card:active{opacity:.95}
+.ci{padding:26px 24px;min-height:340px;display:flex;flex-direction:column;justify-content:center}
+.tag{display:inline-block;padding:3px 10px;border-radius:14px;font-size:.68rem;font-weight:600;color:#fff;margin-bottom:8px;align-self:center}
+.tP{background:#10b981}.tS{background:#f59e0b}.tR{background:#ef4444}.tM{background:#3b82f6}.tF{background:#8b5cf6}.tE{background:#ec4899}.tA{background:#14b8a6}.tT{background:#f97316}
+.cn{font-size:1.5rem;font-weight:700;text-align:center;margin-bottom:6px;color:#1e293b}
+.en{font-size:.92rem;color:#6366f1;font-style:italic;text-align:center;margin-bottom:10px;word-break:break-all}
+.speak{background:#6366f1;color:#fff;border:none;padding:10px 20px;border-radius:16px;font-size:.85rem;cursor:pointer;align-self:center;margin:8px 0;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.speak:hover{background:#4f46e5}
+.tip{text-align:center;font-size:.72rem;color:#aaa;margin-top:8px}
+.dt{margin-bottom:9px}
+.dt-l{font-size:.68rem;font-weight:600;color:#6366f1;margin-bottom:2px}
+.dt-v{font-size:.84rem;line-height:1.5;color:#334155}
+.warn{color:#dc2626;font-weight:600}
+.purple{color:#7c3aed;font-style:italic}
+.sep{border-top:1px solid #e2e8f0;padding-top:12px;margin-top:10px}
+.nav{display:flex;justify-content:center;gap:14px;margin-bottom:12px}
+.nav button{width:48px;height:48px;border-radius:50%;border:none;background:rgba(255,255,255,.2);color:#fff;font-size:1.2rem;cursor:pointer;touch-action:manipulation}
+.nav button:hover{background:rgba(255,255,255,.35)}
+.acts{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.acts button{padding:9px 16px;border-radius:16px;border:none;font-size:.84rem;cursor:pointer;touch-action:manipulation}
+.bk{background:#4ade80;color:#065f46}.bu{background:#fbbf24;color:#78350f}.bf{background:#f87171;color:#7f1d1d}
+.bs{background:rgba(255,255,255,.15);color:#fbbf24;font-size:1rem;border:1px solid rgba(255,255,255,.3)}
+.bs.on{background:#fbbf24;color:#fff}
+.stats{display:flex;justify-content:space-around;flex-wrap:wrap;gap:6px;max-width:600px;margin:0 auto 10px;background:rgba(255,255,255,.1);border-radius:10px;padding:8px}
+.st{text-align:center;color:#fff}.st b{display:block;font-size:1.2rem}.st span{font-size:.68rem;opacity:.8}
+.keys{text-align:center;color:rgba(255,255,255,.5);font-size:.68rem}
+</style>
+</head>
+<body>
+<h1>化妆品原料学习翻卡</h1>
+<p class="sub">基于《化妆品安全技术规范(2015版)》与《已使用化妆品原料目录(2021版)》</p>
+<div class="bar">
+<select id="J_cat"><option value="">全部分类</option><option value="P">准用防腐剂</option><option value="S">准用防晒剂</option><option value="R">限用组分</option><option value="M">保湿剂</option><option value="F">表面活性剂</option><option value="E">乳化剂</option><option value="A">抗氧化剂</option><option value="T">增稠剂</option></select>
+<input id="J_q" placeholder="输入关键词后点搜索">
+<button onclick="doSearch()">搜索</button>
+<button onclick="doReset()">重置</button>
+<button onclick="doShuffle()">随机</button>
+</div>
+<div class="info" id="J_info">-</div>
+<div class="wrap"><div class="card" onclick="flipOrNext()"><div class="ci" id="J_ci">加载中...</div></div></div>
+<div class="nav"><button onclick="goPrev()">&#9664;</button><button onclick="goNext()">&#9654;</button></div>
+<div class="acts">
+<button class="bs" id="J_star" onclick="doStar()">&#9733;</button>
+<button class="bk" onclick="doMark(1)">&#10003; 已掌握</button>
+<button class="bu" onclick="doMark(2)">~ 不确定</button>
+<button class="bf" onclick="doMark(3)">&#10007; 未掌握</button>
+</div>
+<div class="stats"><div class="st"><b id="J_n1">0</b><span>总数</span></div><div class="st"><b id="J_n2">0</b><span>已掌握</span></div><div class="st"><b id="J_n3">0</b><span>不确定</span></div><div class="st"><b id="J_n4">0</b><span>未掌握</span></div><div class="st"><b id="J_n5">0</b><span>收藏</span></div></div>
+<p class="keys">快捷键: 左右箭头翻页 | 空格翻卡 | S朗读 | 1已掌握 2不确定 3未掌握 | F收藏</p>
+<script>
+var D=[];
+(function(){
+var raw=[
+['p1','P','2-溴-2-硝基丙烷-1,3-二醇','BRONOPOL','0.1%','','避免形成亚硝胺',''],
+['p2','P','5-溴-5-硝基-1,3-二噁烷','5-BROMO-5-NITRO-1,3-DIOXANE','0.1%','淋洗类产品','避免形成亚硝胺',''],
+['p3','P','7-乙基双环噁唑烷','7-ETHYLBICYCLOOXAZOLIDINE','0.3%','','禁用于接触粘膜的产品',''],
+['p4','P','苯扎氯铵/苯扎溴铵/苯扎糖精铵','BENZALKONIUM CHLORIDE','总量0.1%(以苯扎氯铵计)','','','避免接触眼睛'],
+['p5','P','苄索氯铵','BENZETHONIUM CHLORIDE','0.1%','','',''],
+['p6','P','苯甲酸及其盐类和酯类','BENZOIC ACID','总量0.5%(以酸计)','','',''],
+['p7','P','苯甲醇','BENZYL ALCOHOL','1.0%','','',''],
+['p8','P','溴氯芬','BROMOCHLOROPHENE','0.1%','','',''],
+['p9','P','氯己定及其盐类','CHLORHEXIDINE','总量0.3%(以氯己定计)','','',''],
+['p10','P','苄氯酚','CHLOROPHENE','0.2%','','',''],
+['p11','P','氯二甲酚','CHLOROXYLENOL','0.5%','','',''],
+['p12','P','氯苯甘醚','CHLORPHENESIN','0.3%','','',''],
+['p13','P','氯咪巴唑','CLIMBAZOLE','0.5%','','',''],
+['p14','P','脱氢乙酸及其盐类','DEHYDROACETIC ACID','总量0.6%(以酸计)','','禁用于喷雾产品',''],
+['p15','P','双(羟甲基)咪唑烷基脲','DIAZOLIDINYL UREA','0.5%','','',''],
+['p16','P','DMDM乙内酰脲','DMDM HYDANTOIN','0.6%','','',''],
+['p17','P','甲醛和多聚甲醛','FORMALDEHYDE','总量0.2%(以游离甲醛计)','','禁用于喷雾产品',''],
+['p18','P','戊二醛','GLUTARAL','0.1%','','禁用于喷雾产品','含戊二醛(浓度超0.05%时)'],
+['p19','P','咪唑烷基脲','IMIDAZOLIDINYL UREA','0.6%','','',''],
+['p20','P','碘丙炔醇丁基氨甲酸酯','IODOPROPYNYL BUTYLCARBAMATE','淋洗0.02%/驻留0.01%/除臭0.0075%','淋洗/驻留/除臭抑汗','禁用于唇部;不得用于3岁以下儿童','三岁以下儿童勿用'],
+['p21','P','甲基异噻唑啉酮(MIT)','METHYLISOTHIAZOLINONE','0.01%','','',''],
+['p22','P','甲基氯异噻唑啉酮/甲基异噻唑啉酮','METHYLCHLOROISOTHIAZOLINONE/MIT','0.0015%','淋洗类产品','不能和MIT同时使用',''],
+['p23','P','邻伞花烃-5-醇','O-CYMEN-5-OL','0.1%','','',''],
+['p24','P','4-羟基苯甲酸酯类(尼泊金类)','PARABENS','单一酯0.4%;混合酯总量0.8%(以酸计)','','丙酯及丁酯之和不超0.14%',''],
+['p25','P','对氯间甲酚','P-CHLORO-M-CRESOL','0.2%','','禁用于接触粘膜的产品',''],
+['p26','P','苯氧乙醇','PHENOXYETHANOL','1.0%','','',''],
+['p27','P','聚氨丙基双胍','POLYAMINOPROPYL BIGUANIDE','0.3%','','',''],
+['p28','P','水杨酸及其盐类(防腐用)','SALICYLIC ACID','总量0.5%(以酸计)','','除香波外不得用于3岁以下儿童','含水杨酸;三岁以下儿童勿用'],
+['p29','P','山梨酸及其盐类','SORBIC ACID','总量0.6%(以酸计)','','',''],
+['p30','P','三氯卡班','TRICLOCARBAN','0.2%','','',''],
+['p31','P','三氯生','TRICLOSAN','0.3%','洗手皂/浴皂/沐浴液/除臭剂(非喷雾)/化妆粉/指甲清洁剂','指甲清洁剂频率不超2周1次',''],
+['p32','P','吡硫鎓锌(防腐用)','ZINC PYRITHIONE','0.5%','淋洗类产品','',''],
+['p33','P','羟甲基甘氨酸钠','SODIUM HYDROXYMETHYLGLYCINATE','0.5%','','',''],
+['s1','S','3-亚苄基樟脑','3-BENZYLIDENE CAMPHOR','2%','','',''],
+['s2','S','4-甲基苄亚基樟脑','4-METHYLBENZYLIDENE CAMPHOR','4%','','',''],
+['s3','S','二苯酮-3','BENZOPHENONE-3','10%','','','含二苯酮-3'],
+['s4','S','二苯酮-4/二苯酮-5','BENZOPHENONE-4/BENZOPHENONE-5','总量5%(以酸计)','','',''],
+['s5','S','双-乙基己氧苯酚甲氧苯基三嗪','BIS-ETHYLHEXYLOXYPHENOL METHOXYPHENYL TRIAZINE','10%','','',''],
+['s6','S','丁基甲氧基二苯甲酰基甲烷(阿伏苯宗)','BUTYL METHOXYDIBENZOYLMETHANE','5%','','',''],
+['s7','S','二乙氨羟苯甲酰基苯甲酸己酯','DIETHYLAMINO HYDROXYBENZOYL HEXYL BENZOATE','10%','','',''],
+['s8','S','甲酚曲唑三硅氧烷','DROMETRIZOLE TRISILOXANE','15%','','',''],
+['s9','S','二甲基PABA乙基己酯','ETHYLHEXYL DIMETHYL PABA','8%','','',''],
+['s10','S','甲氧基肉桂酸乙基己酯(OMC)','ETHYLHEXYL METHOXYCINNAMATE','10%','','',''],
+['s11','S','水杨酸乙基己酯','ETHYLHEXYL SALICYLATE','5%','','',''],
+['s12','S','乙基己基三嗪酮','ETHYLHEXYL TRIAZONE','5%','','',''],
+['s13','S','胡莫柳酯','HOMOSALATE','10%','','',''],
+['s14','S','对甲氧基肉桂酸异戊酯','ISOAMYL P-METHOXYCINNAMATE','10%','','',''],
+['s15','S','亚甲基双-苯并三唑基四甲基丁基酚','METHYLENE BIS-BENZOTRIAZOLYL TETRAMETHYLBUTYLPHENOL','10%','','',''],
+['s16','S','奥克立林','OCTOCRYLENE','10%(以酸计)','','',''],
+['s17','S','苯基苯并咪唑磺酸','PHENYLBENZIMIDAZOLE SULFONIC ACID','总量8%(以酸计)','','',''],
+['s18','S','聚硅氧烷-15','POLYSILICONE-15','10%','','',''],
+['s19','S','二氧化钛','TITANIUM DIOXIDE','25%','','',''],
+['s20','S','氧化锌','ZINC OXIDE','25%','','',''],
+['s21','S','苯基二苯并咪唑四磺酸酯二钠','DISODIUM PHENYL DIBENZIMIDAZOLE TETRASULFONATE','10%(以酸计)','','',''],
+['s22','S','乙基己基丁酰胺基三嗪酮','DIETHYLHEXYL BUTAMIDO TRIAZONE','10%','','',''],
+['r1','R','水杨酸(限用)','SALICYLIC ACID','驻留/淋洗肤用2%;淋洗发用3%','驻留类和淋洗类肤用;淋洗类发用','除香波外不得用于3岁以下儿童','含水杨酸;三岁以下儿童勿用'],
+['r2','R','过氧化氢','HYDROGEN PEROXIDE','发用12%;肤用4%;指甲2%','发用;肤用;指甲硬化','','含过氧化氢;避免接触眼睛;入眼应立即冲洗'],
+['r3','R','甲醛(限用)','FORMALDEHYDE','5%(以甲醛计)','指(趾)甲硬化产品','浓度超0.05%须标注','含甲醛;用油脂保护表皮'],
+['r4','R','氢氧化钾/氢氧化钠','POTASSIUM HYDROXIDE/SODIUM HYDROXIDE','指甲护膜5%;烫直一般2%;专业4.5%','指甲护膜;头发烫直;脱毛;pH调节','','含强碱;避免接触眼睛;可能引起失明;防止儿童抓拿'],
+['r5','R','a-羟基酸(AHA)及其盐类和酯类','ALPHA-HYDROXY ACIDS','总量6%(以酸计)','','pH不低于3.5(淋洗发用除外)','含3%以上AHA时注明与防晒化妆品同时使用'],
+['r6','R','硼酸/硼酸盐/四硼酸盐','BORIC ACID/BORATES','爽身粉5%;其他3%(以硼酸计)','爽身粉;其他(沐浴和烫发除外)','不得用于3岁以下儿童','三岁以下儿童勿用;皮肤剥脱或受刺激时勿用'],
+['r7','R','吡硫鎓锌(限用)','ZINC PYRITHIONE','去屑淋洗发用1.5%;驻留发用0.1%','去头屑淋洗类发用;驻留类发用','',''],
+['r8','R','巯基乙酸及其盐类','THIOGLYCOLIC ACID','烫发一般8%;专业11%;脱毛5%','烫发;脱毛','','含巯基乙酸盐;防止儿童抓拿'],
+['r9','R','过氧化锶','STRONTIUM PEROXIDE','4.5%(以锶计)','淋洗类发用','须符合释放过氧化氢要求','避免接触眼睛;仅供专业使用;戴手套'],
+['r10','R','二硫化硒','SELENIUM DISULFIDE','1%','去头皮屑香波','','含二硫化硒;避免接触眼睛或损伤皮肤'],
+['r11','R','间苯二酚','RESORCINOL','0.5%','发露和香波','','含间苯二酚'],
+['r12','R','聚丙烯酰胺类','POLYACRYLAMIDE','驻留体用:单体残留不超0.1mg/kg;其他不超0.5mg/kg','驻留类体用;其他','',''],
+['r13','R','氨','AMMONIA','6%(以NH3计)','','','含2%以上氨时应注明含氨'],
+['r14','R','氢氧化钙','CALCIUM HYDROXIDE','头发烫直7%;脱毛pH不超12.7;其他pH不超11','头发烫直;脱毛;pH调节','','含强碱;避免接触眼睛;可能引起失明;防止儿童抓拿'],
+['r15','R','氯化羟锆铝配合物','ALUMINUM ZIRCONIUM CHLORIDE HYDROXIDE','总量20%(以无水盐计);锆不超5.4%','抑汗产品','禁用于喷雾产品','不得用于受刺激或受损伤的皮肤'],
+['m1','M','甘油(丙三醇)','GLYCERIN','淋洗30%/驻留51.7%','','',''],
+['m2','M','丁二醇','BUTYLENE GLYCOL','淋洗64.7%/驻留73.4%','','',''],
+['m3','M','透明质酸钠(玻尿酸)','SODIUM HYALURONATE','淋洗1%/驻留2.7%','','',''],
+['m4','M','丙二醇','PROPYLENE GLYCOL','淋洗42.5%/驻留34%','','',''],
+['m5','M','1,2-己二醇','1,2-HEXANEDIOL','驻留66%','','',''],
+['m6','M','1,2-戊二醇','PENTYLENE GLYCOL','驻留21.3%','','',''],
+['m7','M','海藻糖','TREHALOSE','驻留5%','','',''],
+['m8','M','甜菜碱','BETAINE','淋洗10%/驻留5%','','',''],
+['m9','M','泛醇(维生素B5)','PANTHENOL','淋洗5%/驻留5%','','',''],
+['m10','M','尿囊素','ALLANTOIN','淋洗2%/驻留2%','','',''],
+['m11','M','神经酰胺NP','CERAMIDE NP','驻留0.2%','','',''],
+['m12','M','角鲨烷','SQUALANE','驻留50%','','',''],
+['m13','M','尿素','UREA','淋洗10%/驻留10%','','',''],
+['sf1','F','月桂醇硫酸酯钠(SLS)','SODIUM LAURYL SULFATE','淋洗33%/驻留1%','','',''],
+['sf2','F','月桂醇聚醚硫酸酯钠(SLES)','SODIUM LAURETH SULFATE','淋洗70%','','',''],
+['sf3','F','椰油酰胺丙基甜菜碱','COCAMIDOPROPYL BETAINE','淋洗40%','','',''],
+['sf4','F','椰油基葡糖苷','COCO-GLUCOSIDE','淋洗30%','','',''],
+['sf5','F','月桂酰肌氨酸钠','SODIUM LAUROYL SARCOSINATE','淋洗14%','','',''],
+['sf6','F','癸基葡糖苷','DECYL GLUCOSIDE','淋洗30%','','',''],
+['sf7','F','椰油酰基谷氨酸钠','SODIUM COCOYL GLUTAMATE','淋洗20%','','',''],
+['sf8','F','月桂基两性基乙酸钠','SODIUM LAUROAMPHOACETATE','淋洗12%','','',''],
+['e1','E','鲸蜡硬脂醇聚醚-20','CETEARETH-20','驻留5%','','',''],
+['e2','E','聚山梨醇酯-60(吐温60)','POLYSORBATE 60','淋洗8%/驻留5%','','',''],
+['e3','E','聚山梨醇酯-80(吐温80)','POLYSORBATE 80','淋洗15%/驻留7%','','',''],
+['e4','E','山梨坦硬脂酸酯(司盘60)','SORBITAN STEARATE','驻留6%','','',''],
+['e5','E','PEG-100硬脂酸酯','PEG-100 STEARATE','驻留5%','','',''],
+['e6','E','甘油硬脂酸酯','GLYCERYL STEARATE','淋洗10%/驻留17%','','',''],
+['e7','E','鲸蜡硬脂醇橄榄油酸酯','CETEARYL OLIVATE','驻留6%','','',''],
+['a1','A','生育酚(维生素E)','TOCOPHEROL','淋洗3%/驻留5%','','',''],
+['a2','A','生育酚乙酸酯','TOCOPHERYL ACETATE','淋洗5%/驻留5%','','',''],
+['a3','A','抗坏血酸(维生素C)','ASCORBIC ACID','淋洗3%/驻留20%','','',''],
+['a4','A','抗坏血酸葡糖苷','ASCORBYL GLUCOSIDE','驻留2%','','',''],
+['a5','A','丁基羟基甲苯(BHT)','BHT','淋洗1%/驻留0.5%','','',''],
+['a6','A','没食子酸丙酯','PROPYL GALLATE','驻留0.1%','','',''],
+['a7','A','视黄醇(维生素A)','RETINOL','驻留1%','','',''],
+['a8','A','烟酰胺(维生素B3)','NIACINAMIDE','淋洗5%/驻留5%','','',''],
+['t1','T','卡波姆','CARBOMER','淋洗5%/驻留4%','','',''],
+['t2','T','黄原胶','XANTHAN GUM','淋洗5%/驻留3%','','',''],
+['t3','T','羟乙基纤维素','HYDROXYETHYLCELLULOSE','淋洗5%/驻留5%','','',''],
+['t4','T','丙烯酸(酯)类/C10-30烷醇丙烯酸酯交联聚合物','ACRYLATES/C10-30 ALKYL ACRYLATE CROSSPOLYMER','驻留2%','','',''],
+['t5','T','鲸蜡硬脂醇','CETEARYL ALCOHOL','淋洗25%/驻留20%','','',''],
+['t6','T','硬脂酸','STEARIC ACID','淋洗20%/驻留15%','','','']
+];
+for(var k=0;k<raw.length;k++){
+  var r=raw[k];
+  D.push({i:r[0],c:r[1],n:r[2],e:r[3],x:r[4],s:r[5],r:r[6],l:r[7]});
+}
+})();
+
+var CL={P:'准用防腐剂',S:'准用防晒剂',R:'限用组分',M:'保湿剂',F:'表面活性剂',E:'乳化剂',A:'抗氧化剂',T:'增稠剂'};
+var CT={P:'tP',S:'tS',R:'tR',M:'tM',F:'tF',E:'tE',A:'tA',T:'tT'};
+var list=[];
+var idx=0;
+var flipped=false;
+var marks={};
+var stars={};
+
+function shuffle(a){
+  var b=a.slice();
+  for(var i=b.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var t=b[i];b[i]=b[j];b[j]=t;
+  }
+  return b;
+}
+
+function doSearch(){
+  var cat=document.getElementById('J_cat').value;
+  var q=document.getElementById('J_q').value.trim().toLowerCase();
+  list=[];
+  for(var k=0;k<D.length;k++){
+    var d=D[k];
+    if(cat && d.c!==cat) continue;
+    if(q && d.n.toLowerCase().indexOf(q)===-1 && d.e.toLowerCase().indexOf(q)===-1) continue;
+    list.push(d);
+  }
+  if(!q) list=shuffle(list);
+  idx=0;
+  flipped=false;
+  show();
+}
+
+function doReset(){
+  document.getElementById('J_q').value='';
+  document.getElementById('J_cat').value='';
+  doSearch();
+}
+
+function doShuffle(){
+  list=shuffle(list);
+  idx=0;
+  flipped=false;
+  show();
+}
+
+function show(){
+  var box=document.getElementById('J_ci');
+  var info=document.getElementById('J_info');
+  if(!list.length){
+    box.innerHTML='<p style="text-align:center;color:#999;font-size:1rem">没有匹配的原料</p>';
+    info.textContent='0 / 0';
+    return;
+  }
+  var d=list[idx];
+  var h='';
+  h+='<span class="tag '+CT[d.c]+'">'+CL[d.c]+'</span>';
+
+  if(!flipped){
+    h+='<p class="cn">'+d.n+'</p>';
+    h+='<p class="tip" style="margin-top:20px;font-size:.85rem;color:#94a3b8">&#128073; 点击卡片查看详情</p>';
+  } else {
+    h+='<p class="cn" style="font-size:1.15rem">'+d.n+'</p>';
+    h+='<p class="en">'+d.e+'</p>';
+    h+='<button class="speak" onclick="event.stopPropagation();doSpeak()">&#128266; 朗读INCI(美式)</button>';
+    if(d.x){h+='<div class="dt"><div class="dt-l">最大允许浓度</div><div class="dt-v">'+d.x+'</div></div>';}
+    if(d.s){h+='<div class="dt"><div class="dt-l">使用范围</div><div class="dt-v">'+d.s+'</div></div>';}
+    if(d.r){h+='<div class="dt"><div class="dt-l">限制条件</div><div class="dt-v">'+d.r+'</div></div>';}
+    if(d.l){h+='<div class="dt"><div class="dt-l">标签必须标印</div><div class="dt-v warn">'+d.l+'</div></div>';}
+    var tip=getTip(d);
+    if(tip){h+='<div class="dt sep"><div class="dt-l">记忆提示</div><div class="dt-v purple">'+tip+'</div></div>';}
+    h+='<p class="tip">&#128073; 再次点击进入下一张</p>';
+  }
+  box.innerHTML=h;
+  info.textContent=(idx+1)+' / '+list.length;
+  document.getElementById('J_star').className=stars[d.i]?'bs on':'bs';
+  updS();
+}
+
+function getTip(d){
+  var t=[];
+  if(d.e.indexOf('PARABEN')>=0) t.push('尼泊金=对羟基苯甲酸酯,按碳链分甲乙丙丁酯');
+  if(d.e.indexOf('ISOTHIAZOLINONE')>=0) t.push('异噻唑啉酮类防腐剂,近年限制趋严');
+  if(d.e==='PHENOXYETHANOL') t.push('目前最主流广谱防腐剂,安全性好');
+  if(d.e.indexOf('SULFATE')>=0&&d.c==='F') t.push('阴离子表活,泡沫丰富但可能刺激');
+  if(d.e.indexOf('GLUCOSIDE')>=0) t.push('APG烷基糖苷,天然来源温和表活');
+  if(d.e.indexOf('GLUTAMATE')>=0) t.push('氨基酸表活,弱酸性非常温和');
+  if(d.e==='TITANIUM DIOXIDE'||d.e==='ZINC OXIDE') t.push('物理防晒剂,反射散射紫外线');
+  if(d.e.indexOf('BENZOPHENONE')>=0) t.push('二苯酮类化学防晒,吸收UVA+UVB');
+  if(d.e.indexOf('METHOXYCINNAMATE')>=0) t.push('肉桂酸酯类化学防晒,主吸收UVB');
+  if(d.e.indexOf('HYALURONATE')>=0) t.push('玻尿酸=透明质酸,吸附自身1000倍水分');
+  if(d.e.indexOf('CERAMIDE')>=0) t.push('神经酰胺=皮肤屏障核心脂质成分');
+  if(d.e==='SQUALANE') t.push('角鲨烷=皮脂类似物,亲肤封闭润肤');
+  if(d.e==='RETINOL') t.push('VA醇促细胞更新抗老,注意避光和耐受');
+  if(d.e==='NIACINAMIDE') t.push('VB3全能成分:美白+控油+修护屏障');
+  if(d.e.indexOf('ASCORBIC')>=0) t.push('VC类抗氧化美白,注意稳定性');
+  if(d.e==='CARBOMER') t.push('卡波姆需碱(TEA/NaOH)中和才能增稠');
+  if(d.e==='GLYCERIN') t.push('最经典小分子保湿剂,强吸湿性');
+  if(d.e.indexOf('POLYSORBATE')>=0) t.push('吐温系列非离子O/W乳化剂');
+  if(d.e.indexOf('SORBITAN')>=0) t.push('司盘系列W/O乳化剂,常与吐温配合');
+  if(d.e.indexOf('TRICLOSAN')>=0) t.push('三氯生争议大,多国已限制或禁用');
+  if(d.l&&d.l.indexOf('儿童')>=0) t.push('重点:婴幼儿产品禁用/限用');
+  return t.join('; ');
+}
+
+function doSpeak(){
+  if(!list.length) return;
+  var text=list[idx].e;
+  try{
+    var audio=document.getElementById('J_audio');
+    if(!audio){
+      audio=document.createElement('audio');
+      audio.id='J_audio';
+      document.body.appendChild(audio);
+    }
+    audio.src='https://dict.youdao.com/dictvoice?audio='+encodeURIComponent(text)+'&type=2';
+    audio.play().catch(function(){
+      if(window.speechSynthesis){
+        var u=new SpeechSynthesisUtterance(text);
+        u.lang='en-US';u.rate=0.75;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(u);
+      }
+    });
+  }catch(ex){
+    if(window.speechSynthesis){
+      var u=new SpeechSynthesisUtterance(text);
+      u.lang='en-US';u.rate=0.75;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+  }
+}
+
+function flipOrNext(){
+  if(!list.length) return;
+  if(flipped){goNext();}
+  else{flipped=true;show();}
+}
+
+function goNext(){if(idx<list.length-1){idx++;flipped=false;show();}}
+function goPrev(){if(idx>0){idx--;flipped=false;show();}}
+
+function doStar(){
+  if(!list.length) return;
+  var d=list[idx];
+  stars[d.i]=!stars[d.i];
+  show();
+}
+
+function doMark(v){
+  if(!list.length) return;
+  marks[list[idx].i]=v;
+  goNext();
+}
+
+function updS(){
+  var k=0,u=0,f=0,s=0;
+  for(var id in marks){if(marks[id]===1)k++;else if(marks[id]===2)u++;else if(marks[id]===3)f++;}
+  for(var id in stars){if(stars[id])s++;}
+  document.getElementById('J_n1').textContent=list.length;
+  document.getElementById('J_n2').textContent=k;
+  document.getElementById('J_n3').textContent=u;
+  document.getElementById('J_n4').textContent=f;
+  document.getElementById('J_n5').textContent=s;
+}
+
+document.getElementById('J_cat').onchange=doSearch;
+
+document.onkeydown=function(ev){
+  var t=ev.target.tagName;
+  if(t==='INPUT'||t==='SELECT') return;
+  var k=ev.key;
+  if(k==='ArrowRight') goNext();
+  else if(k==='ArrowLeft') goPrev();
+  else if(k===' '){ev.preventDefault();flipOrNext();}
+  else if(k==='s'||k==='S') doSpeak();
+  else if(k==='1') doMark(1);
+  else if(k==='2') doMark(2);
+  else if(k==='3') doMark(3);
+  else if(k==='f'||k==='F') doStar();
+};
+
+if(window.speechSynthesis) try{speechSynthesis.getVoices();}catch(e){}
+doSearch();
+</script>
+</body>
+</html>
