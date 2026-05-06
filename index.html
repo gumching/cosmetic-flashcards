@@ -170,7 +170,6 @@ function show(){
       if(ttsText.indexOf('/')>=0) ttsText=ttsText.split('/')[0];
       var t=encodeURIComponent(ttsText);
       h+='<div class="audio-box"><audio controls preload="none" referrerpolicy="no-referrer">';
-      h+='<source src="https://dict.youdao.com/dictvoice?le=eng&audio='+t+'" type="audio/mpeg">';
       h+='<source src="https://fanyi.baidu.com/gettts?lan=en&text='+t+'&spd=3&source=web" type="audio/mpeg">';
       h+='<source src="https://tts.baidu.com/text2audio?tex='+t+'&cuid=dict&lan=en&ctp=1&pdt=30&vol=9&spd=4" type="audio/mpeg">';
       h+='</audio></div>';
